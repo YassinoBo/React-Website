@@ -17,10 +17,10 @@ export default function Navbar() {
   const navItems = [
     { name: 'Home', href: '#home', icon: HomeIcon },
     { name: 'Unsere Tiramisu', href: '#products', icon: Cake },
-    { name: 'Über uns', href: '#about', icon: Users },
-    { name: 'News', href: '#news', icon: Newspaper },
     { name: 'Anfahrt', href: '#location', icon: MapPin },
-    { name: 'Kontakt', href: '#contact', icon: Phone }
+    { name: 'Über uns', href: '#about', icon: Users },
+    { name: 'Kontakt', href: '#contact', icon: Phone },
+    { name: 'News', href: '#news', icon: Newspaper }
   ];
 
   return (
@@ -37,7 +37,7 @@ export default function Navbar() {
               <img 
                 src={logoImage} 
                 alt="TiramiYou Logo" 
-                className="h-12 md:h-14 w-auto shadow-lg group-hover:scale-105 transition-transform duration-300 rounded-xl"
+                className="h-16 md:h-20 w-auto shadow-xl group-hover:scale-105 transition-transform duration-300 rounded-3xl"
               />
             </a>
 
@@ -61,39 +61,41 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden relative w-12 h-12 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors"
+              className="lg:hidden relative w-12 h-12 flex items-center justify-center rounded-full transition-colors"
+              style={{ color: isOpen ? 'white' : '#333' }}
             >
               {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        <div className={`lg:hidden overflow-hidden transition-all duration-300 ${
-          isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-        }`}>
-          <div className="px-4 pt-4 pb-6 border-t border-white/30" style={{ backgroundColor: '#FF93A2' }}>
-            <div className="flex flex-col gap-2">
-              {navItems.map((item, index) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="px-5 py-3 text-white hover:bg-white/20 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
-                  style={{ 
-                    animation: isOpen ? `slideDown 0.3s ease-out ${index * 30}ms both` : 'none'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#FEF6CC'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
-                </a>
-              ))}
-            </div>
+      </nav>
+
+      {/* Mobile Menu - außerhalb der Navbar */}
+      <div className={`fixed top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-md lg:hidden z-40 transition-all duration-500 ${
+        isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+      }`}>
+        <div className="px-6 py-6 rounded-3xl shadow-2xl" style={{ backgroundColor: '#FF93A2' }}>
+          <div className="flex flex-col gap-2">
+            {navItems.map((item, index) => (
+              <a
+                key={item.name}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className="px-5 py-3 text-white hover:bg-white/20 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
+                style={{ 
+                  animation: isOpen ? `slideDown 0.3s ease-out ${index * 30}ms both` : 'none'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#FEF6CC'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
+              >
+                <item.icon className="w-4 h-4" />
+                {item.name}
+              </a>
+            ))}
           </div>
         </div>
-      </nav>
+      </div>
 
       <style>{`
         @keyframes slideDown {
