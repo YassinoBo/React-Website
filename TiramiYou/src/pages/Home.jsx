@@ -4,7 +4,8 @@ import HomeHero from "../components/HomeHero.jsx";
 import StoreGallery from "../components/StoreGallery";
 import { useLanguage } from '../LanguageContext.jsx';
 import { translations } from '../translations.js';
-
+import RotatingCarousel from "../components/RotatingCarousel";
+//import LocationPromotion from "../components/LocationPromotion";
 
 /* ======================
    1️⃣ Reviews
@@ -36,7 +37,7 @@ Viel Erfolg, freue mich weitere Sorten zu probieren!`,
   },
   {
     name: "Irfan Nurkovic",
-    text: `Ein neuer Lieblingsort in Frankfurt! Stilvolles, gemütliches Ambiente, superfreundliches Team und himmlische Desserts – das Tiramisu ist einfach perfekt: cremig, frisch und voller Geschmack. Dazu gibt’s hervorragenden Kaffee, der alles abrundet.
+    text: `Ein neuer Lieblingsort in Frankfurt! Stilvolles, gemütliches Ambiente, superfreundliches Team und himmlische Desserts – das Tiramisu ist einfach perfekt: cremig, frisch und voller Geschmack. Dazu gibt's hervorragenden Kaffee, der alles abrundet.
 Fazit: Fünf Sterne in jeder Kategorie – Geschmack, Qualität, Service und Atmosphäre. Ein Muss für alle, die guten Kaffee und feine Desserts lieben!`,
     stars: 5,
   },
@@ -57,7 +58,7 @@ function Stars({ count }) {
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
-          className={`w-4 h-4 ${i < count ? "text-yellow-400" : "text-gray-300"}`}
+          className={`w-5 h-5 ${i < count ? "text-yellow-400" : "text-gray-300"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -80,49 +81,53 @@ function ReviewCard({ review }) {
     ? review.text.slice(0, 150)
     : review.text;
 
-  // Klick auf die gesamte Box nur erlaubt, wenn Text länger als 150 Zeichen
   const handleClick = () => {
     if (isLong) setExpanded(!expanded);
   };
 
+  // Initialen für Avatar
+  const initials = review.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+
   return (
     <div
       onClick={handleClick}
-      className="bg-white rounded-xl shadow p-5 flex flex-col gap-3 cursor-pointer w-[300px] flex-shrink-0"
+      className={`bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 flex flex-col gap-4 w-[340px] flex-shrink-0 transition-all duration-300 border border-gray-100 ${isLong ? 'cursor-pointer' : ''}`}
     >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
-          {review.name[0]}
-        </div>
-        <div>
-          <p className="text-sm font-semibold">{review.name}</p>
-          <Stars count={review.stars} />
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FF93A2] to-[#FF6B7A] flex items-center justify-center font-bold text-white text-sm shadow-md">
+            {initials}
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900">{review.name}</p>
+            <Stars count={review.stars} />
+          </div>
         </div>
       </div>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-gray-700 leading-relaxed">
         {displayText}
         {isLong && !expanded && "..."}
-        {isLong && (
-          <span
-            onClick={(e) => {
-              e.stopPropagation();
-              setExpanded(!expanded);
-            }}
-            className="text-pink-500 font-semibold ml-1 cursor-pointer"
-          >
-            {expanded ? "weniger" : "mehr"}
-          </span>
-        )}
       </p>
+
+      {isLong && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
+          className="text-[#FF93A2] font-semibold text-sm hover:text-[#FF6B7A] transition-colors self-start"
+        >
+          {expanded ? "weniger anzeigen" : "mehr lesen"}
+        </button>
+      )}
     </div>
   );
 }
 
-
-
 function ReviewsCarousel() {
   const [startIndex, setStartIndex] = useState(0);
+  const [showMobileHint, setShowMobileHint] = useState(true);
   const visibleCount = 4;
 
   const handlePrev = () => setStartIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
@@ -136,12 +141,20 @@ function ReviewsCarousel() {
     return visible;
   };
 
+  // Mobile Hint nach 3 Sekunden ausblenden
+  useEffect(() => {
+    const timer = setTimeout(() => setShowMobileHint(false), 120000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="relative max-w-6xl mx-auto">
+    <div className="relative">
       {/* Linker Pfeil */}
       <button
         onClick={handlePrev}
-        className="absolute left-[-75px] top-1/2 transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl">
+        aria-label="Vorherige Bewertung"
+        className="hidden md:flex absolute left-[-40px] top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center"
+      >
         <svg
           className="w-6 h-6 text-white"
           fill="none"
@@ -152,19 +165,37 @@ function ReviewsCarousel() {
         </svg>
       </button>
 
-      {/* Scrollbarer Container */}
-      <div className="flex gap-6 overflow-x-auto scrollbar-none items-start scroll-snap-x touch-pan-x -webkit-overflow-scrolling:touch">
-        {getVisibleReviews().map((review, i) => (
-          <div className="scroll-snap-start">
-            <ReviewCard key={i} review={review} />
+      {/* Mobile Swipe Indicator */}
+      {showMobileHint && (
+        <div className="md:hidden absolute left-1/2 -translate-x-1/2 -top-12 z-20 animate-bounce">
+          <div className="bg-[#FF93A2] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+            </svg>
+            Wischen zum Scrollen
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </div>
+        </div>
+      )}
+
+      {/* Scrollbarer Container */}
+      <div 
+        className="flex gap-6 overflow-x-auto scrollbar-none items-start scroll-smooth touch-pan-x px-4"
+        onScroll={() => setShowMobileHint(false)}
+      >
+        {getVisibleReviews().map((review, i) => (
+          <ReviewCard key={i} review={review} />
         ))}
       </div>
 
       {/* Rechter Pfeil */}
       <button
         onClick={handleNext}
-        className="absolute right-[-75px] top-1/2 transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl">
+        aria-label="Nächste Bewertung"
+        className="hidden md:flex absolute right-[-60px] top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center" > 
+
         <svg
           className="w-6 h-6 text-white rotate-180"
           fill="none"
@@ -177,8 +208,6 @@ function ReviewsCarousel() {
     </div>
   );
 }
-
-
 
 /* ======================
    4️⃣ Home Page
@@ -194,31 +223,12 @@ export default function Home() {
       {/* HERO */}
       <HomeHero />
 
-      {/* BEREICHE */}
-      <section className="bg-[rgb(255,240,243)] py-20">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl md:text-3xl text-gray-600 mb-12">
-            {translations[language].more}
-          </h2>
+      {/* <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 px-6 lg:px-16 py-16"></div>*/}
+      <RotatingCarousel />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: translations[language].tiramisu, href: "/produkte" },
-              { title: translations[language].news, href: "/news" },
-              { title: translations[language].direct, href: "/anfahrt" },
-            ].map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="block bg-white rounded-2xl p-6 text-center shadow hover:shadow-lg transition"
-              >
-                <h3 className="font-semibold">{item.title}</h3>
-              </a>
-            ))}
-
-          </div>
-        </div>
-      </section>
+      {/* ANFAHRT
+      <LocationPromotion />
+      */}
 
       {/* LADEN FOTOS */}
       <StoreGallery />
@@ -233,7 +243,7 @@ export default function Home() {
           </div>
 
           <p className="text-sm text-gray-600">
-            {translations[language].based} <strong>109 {translations[language].review}</strong>
+            {translations[language].based} <strong>111 {translations[language].review}</strong>
           </p>
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
