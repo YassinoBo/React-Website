@@ -9,22 +9,6 @@ function Produkte() {
 
   const produktListe = [
     {
-      name: 'Classic',
-      untertitel: translations[language].a,
-      beschreibung: translations[language].a_2,
-      preis: '5,90 €',
-      bild: '/images/Classic.png',
-      bestseller: true,
-    },
-    {
-      name: 'Lotus Biscoff',
-      untertitel: translations[language].b,
-      beschreibung: translations[language].b_2,
-      preis: '6,90 €',
-      bild: '/images/Lotus.png',
-      bestseller: true,
-    },
-    {
       name: 'Bueno',
       untertitel: translations[language].c,
       beschreibung: translations[language].c_2,
@@ -33,11 +17,27 @@ function Produkte() {
       bestseller: true,
     },
     {
+      name: 'Classic',
+      untertitel: translations[language].a,
+      beschreibung: translations[language].a_2,
+      preis: '5,90 €',
+      bild: '/images/Classic.png',
+      bestseller: true,
+    },
+    {
       name: translations[language].pistachio,
       untertitel: translations[language].d,
       beschreibung: translations[language].d_2,
       preis: '7,40 €',
-      bild: '/images/Pistazie.png'
+      bild: '/images/Pistazie.png',
+      bestseller: true
+    },
+    {
+      name: 'Lotus Biscoff',
+      untertitel: translations[language].b,
+      beschreibung: translations[language].b_2,
+      preis: '6,90 €',
+      bild: '/images/Lotus.png'
     },
     {
       name: translations[language].berry,
@@ -121,6 +121,34 @@ function Produkte() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-16 text-center">
+          <div className="bg-white rounded-3xl border-2 border-[#FF93A2] p-8 md:p-12 shadow-xl">
+            <h2 className='text-3xl md:text-4xl font-black mb-4' style={{ color: '#FF93A2' }}>
+              FAQ
+            </h2>
+            <div>
+              <div>
+                <p className='text'>
+                  Frage1
+                </p>
+                <hr />
+              </div>     
+              <div>
+                <p>
+                  Frage1
+                </p>
+                <hr />
+              </div>     
+              <div>
+                <p>
+                  Frage1
+                </p>
+                <hr />
+              </div>     
+            </div>                  
+          </div>
         </div>
 
         {/* Call-to-Action */}

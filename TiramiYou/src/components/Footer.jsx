@@ -56,9 +56,9 @@ export default function Footer() {
 
           {/* Legal Links */}
           <div className="flex gap-6 text-sm text-gray-600">
-            <a href="#impressum" className="hover:text-pink-500 transition-colors">{translations[language].imprint}</a>
-            <a href="#datenschutz" className="hover:text-pink-500 transition-colors">{translations[language].pol}</a>
-            <a href="#agb" className="hover:text-pink-500 transition-colors">AGB</a>
+            <a href="/impressum" className="hover:text-pink-500 transition-colors">{translations[language].imprint}</a>
+            <a href="/datenschutz" className="hover:text-pink-500 transition-colors">{translations[language].pol}</a>
+            <a href="/agb" className="hover:text-pink-500 transition-colors">AGB</a>
           </div>
 
         </div>

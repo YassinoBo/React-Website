@@ -52,7 +52,7 @@ export default function Navbar() {
         <div className="w-full px-6 sm:px-8 lg:px-10 relative">
           <div className="flex justify-between items-center">
             {/* Logo */}
-            <a href="#home" className="flex items-center group">
+            <a href="" className="flex items-center group">
               <img
                 src={logoImage}
                 alt="TiramiYou Logo"
