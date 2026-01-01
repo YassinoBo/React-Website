@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef} from 'react';
 import { Menu, X, MapPin, Home as HomeIcon, Cake, Users, Newspaper, Phone } from 'lucide-react';
-import logoImage from '../src/assets/TiramiYOU.jpg';
+import logoImage from '../src/assets/TiramiYOU.JPG';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
