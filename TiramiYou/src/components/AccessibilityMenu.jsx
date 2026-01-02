@@ -4,25 +4,34 @@ import { translations } from '../translations.js';
 
 export default function AccessibilityMenu() {
   const [open, setOpen] = useState(false);
-  const [fontSize, setFontSize] = useState(100);
-  const [bigCursor, setBigCursor] = useState(false);
+  const [fontSize, setFontSize] = useState(() => {
+    const saved = localStorage.getItem('fontSize');
+    return saved ? parseInt(saved) : 100;
+  });
+  const [bigCursor, setBigCursor] = useState(() => {
+    const saved = localStorage.getItem('bigCursor');
+    return saved === 'true';
+  });
   const { language, setLanguage } = useLanguage();
 
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
-  // Schriftgröße anwenden
+  // Schriftgröße anwenden und speichern
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize}%`;
+    localStorage.setItem('fontSize', fontSize.toString());
   }, [fontSize]);
 
-  // Sprache anwenden
+  // Sprache anwenden (wird jetzt im LanguageContext gespeichert)
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
   // Großer Mauszeiger
   useEffect(() => {
+    localStorage.setItem('bigCursor', bigCursor.toString());
+
     if (bigCursor) {
       document.body.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"60\" height=\"60\" viewBox=\"0 0 24 24\" fill=\"white\" stroke=\"black\" stroke-width=\"1\"><path d=\"M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z\"/></svg>') 12 12, auto";
 
@@ -32,8 +41,64 @@ export default function AccessibilityMenu() {
         * { 
           cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') 12 12, auto !important;
         }
-        button:hover, a:hover, input:hover, select:hover {
+        button:hover,
+        a:hover,  
+        #do_hover:hover, 
+        input:hover, 
+        select:hover, 
+        img:hover, 
+        svg:hover, 
+        path:hover,
+        #image-modal:hover,
+        .star-rating:hover,
+        [role="button"]:hover,
+        .clickable:hover,
+        .menu-item:hover,
+        .rating-stars:hover,
+        header img:hover,
+        footer img:hover,
+        nav a:hover,
+        .gallery-image:hover,
+        .modal-image:hover,
+        .close-button:hover,
+        iframe:hover,
+        iframe *:hover,
+        .leaflet-container:hover,
+        .leaflet-container *:hover,
+        .leaflet-interactive:hover,
+        [onclick]:hover,
+        [class*="button"]:hover,
+        [class*="btn"]:hover,
+        [class*="link"]:hover,
+        [class*="card"]:hover,
+        [class*="card"] *:hover,
+        [class*="hover"]:hover,
+        [class*="review"]:hover,
+        [class*="rating"]:hover,
+        [class*="testimonial"]:hover,
+        .review:hover,
+        .review *:hover,
+        .testimonial:hover,
+        .testimonial *:hover,
+        .rating:hover,
+        .rating *:hover,
+        [class*="review"] *:hover,
+        [class*="rating"] *:hover,
+        [class*="testimonial"] *:hover,
+        .perspective:hover,
+        .perspective *:hover,
+        .perspective div:hover,
+        [class*="rounded"]:hover,
+        [class*="shadow"]:hover,
+        [class*="bg-white"]:hover,
+        [class*="bg-white"] *:hover,
+        .fixed:hover,
+        .fixed button:hover {
           cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="rgb(236, 72, 153)" stroke="white" stroke-width="1"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') 14 14, pointer !important;
+        }
+        .no_hover:hover,
+        .no_hover *:hover {
+          cursor: inherit !important;
         }
       `;
       document.head.appendChild(style);
@@ -68,6 +133,8 @@ export default function AccessibilityMenu() {
     setFontSize(100);
     setBigCursor(false);
     setLanguage("de");
+    localStorage.removeItem('fontSize');
+    localStorage.removeItem('bigCursor');
   }
 
   return (
@@ -94,7 +161,7 @@ export default function AccessibilityMenu() {
         className={`fixed bottom-24 right-6 z-40 w-80 bg-white rounded-2xl shadow-xl p-5 transition-all duration-300 ${open
           ? "opacity-100 translate-y-0"
           : "opacity-0 translate-y-4 pointer-events-none"
-        }`}
+          }`}
       >
         <h3 className="text-lg font-semibold mb-4">
           {translations[language].accessibility}
