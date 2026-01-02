@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLanguage } from '../LanguageContext.jsx'; 
+import { useLanguage } from '../LanguageContext.jsx';
 import { translations } from '../translations.js';
 
 function TiramisuPodium() {
-    const { language } = useLanguage();
+  const { language } = useLanguage();
   return (
     <section className="bg-white py-20 h-full flex items-center">
       <div className="max-w-6xl mx-auto px-4 w-full">
@@ -21,7 +21,7 @@ function TiramisuPodium() {
             </p>
           </div>
 
-          <div className="flex justify-center items-end gap-4 md:gap-8 mb-12">
+          <div className="flex justify-center items-end gap-4 md:gap-8 mb-12 transform scale-87 md:scale-100">
             {/* Platz 2 */}
             <div className="flex flex-col items-center transform hover:scale-105 transition-all duration-300">
               <div className="relative mb-4 group">
@@ -78,10 +78,11 @@ function TiramisuPodium() {
             </div>
           </div>
 
+
           <div className="text-center">
             <a
               href="/produkte"
-              id= "do_hover"
+              id="do_hover"
               className="inline-flex items-center gap-3 bg-[#FF93A2] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl group"
             >
               <span>{translations[language].compMenu}</span>
@@ -98,7 +99,7 @@ function TiramisuPodium() {
 }
 
 function NewsPromotion() {
-    const { language } = useLanguage();
+  const { language } = useLanguage();
   return (
     <section className="bg-white py-20 h-full flex items-center">
       <div className="max-w-6xl mx-auto px-4 w-full">
@@ -223,7 +224,7 @@ export default function RotatingCarousel() {
   // Auto-rotation
   useEffect(() => {
     if (isPaused) return;
-    
+
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % sections.length);
     }, 6000);
@@ -258,7 +259,7 @@ export default function RotatingCarousel() {
 
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
@@ -275,7 +276,7 @@ export default function RotatingCarousel() {
   };
 
   return (
-    <div 
+    <div
       className="relative w-full overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -284,7 +285,7 @@ export default function RotatingCarousel() {
       onTouchEnd={handleTouchEnd}
     >
       {/* Carousel Container */}
-      <div 
+      <div
         className="flex transition-transform duration-700 ease-in-out no_hover"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
@@ -314,7 +315,7 @@ export default function RotatingCarousel() {
       {currentIndex < sections.length - 1 && (
         <button
           onClick={nextSlide}
-          className="hidden md:flex absolute left-1/2 -translate-x-[-600px] top-1/2 -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl items-center justify-center"          aria-label="Nächste Sektion"
+          className="hidden md:flex absolute left-1/2 -translate-x-[-600px] top-1/2 -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl items-center justify-center" aria-label="Nächste Sektion"
         >
           <svg
             className="w-6 h-6 text-white"
@@ -337,18 +338,16 @@ export default function RotatingCarousel() {
             aria-label={`Zu ${section.name} wechseln`}
           >
             <div
-              className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${
-                currentIndex === index
+              className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${currentIndex === index
                   ? "bg-[#FF93A2] border-[#FF93A2] scale-125 shadow-lg"
                   : "bg-gray-400 border-gray-500 hover:bg-gray-600 hover:border-gray-700 hover:scale-110"
-              }`}
+                }`}
             />
             <span
-              className={`text-xs font-bold transition-all duration-300 ${
-                currentIndex === index
+              className={`text-xs font-bold transition-all duration-300 ${currentIndex === index
                   ? "text-[#FF93A2]"
                   : "text-gray-700"
-              }`}
+                }`}
             >
               {section.name}
             </span>

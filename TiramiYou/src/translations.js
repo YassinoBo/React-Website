@@ -72,6 +72,7 @@ export const translations = {
         text: "Frische Erdbeeren treffen auf cremige Mascarpone – eine fruchtig-süße Variation unseres Klassikers, perfekt für den Frühling.",
         pop: "Sehr beliebt",
         translate: "Zum Vergrößern klicken",
+        scroll: "Wischen zum Scrollen"
     },
     en: {
         a: "The Italian classic",
@@ -145,6 +146,7 @@ export const translations = {
         text: "Fresh strawberries meet creamy mascarpone – a fruity-sweet twist on our classic, perfect for spring.",
         pop: "Very popular",
         translate: "Click to zoom",
+        scroll: "Swipe to Scroll",
     },
 };
 
