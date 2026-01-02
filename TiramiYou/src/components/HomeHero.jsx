@@ -47,7 +47,7 @@ export default function HomeHero() {
 
         {/* Links - Text & Logo */}
         <div className="text-center lg:text-left space-y-8">
-          <img src="/images/logo.png" alt="TiramiYou Logo" className="h-32 md:h-40 mx-auto lg:mx-0 drop-shadow-xl" />
+          <img src="/images/logo.png" alt="TiramiYou Logo" className="h-32 md:h-40 mx-auto lg:mx-0 drop-shadow-xl no_hover"/>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight">
             {translations[language].spoonful}<br />
             <span style={{ color: '#FF93A2' }}>{translations[language].happy}</span>
@@ -67,7 +67,7 @@ export default function HomeHero() {
                 className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
               >
                 {slide.type === 'image' ? (
-                  <img src={slide.src} alt={`Slide ${index + 1}`} className="w-full h-full object-cover" />
+                  <img src={slide.src} alt={`Slide ${index + 1}`} className="w-full h-full object-cover no_hover" />
                 ) : (
                   <video src={slide.src} className="w-full h-full object-cover" autoPlay muted loop />
                 )}

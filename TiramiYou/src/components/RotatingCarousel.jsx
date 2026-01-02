@@ -81,6 +81,7 @@ function TiramisuPodium() {
           <div className="text-center">
             <a
               href="/produkte"
+              id= "do_hover"
               className="inline-flex items-center gap-3 bg-[#FF93A2] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl group"
             >
               <span>{translations[language].compMenu}</span>
@@ -147,6 +148,7 @@ function NewsPromotion() {
 
               <a
                 href="/news"
+                id="do_hover"
                 className="inline-flex items-center gap-3 bg-[#FF93A2] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl w-fit group"
               >
                 <span>{translations[language].newCreation}</span>
@@ -283,7 +285,7 @@ export default function RotatingCarousel() {
     >
       {/* Carousel Container */}
       <div 
-        className="flex transition-transform duration-700 ease-in-out"
+        className="flex transition-transform duration-700 ease-in-out no_hover"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {sections.map((section, index) => (
@@ -297,9 +299,7 @@ export default function RotatingCarousel() {
       {currentIndex > 0 && (
         <button
           onClick={prevSlide}
-          className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center"
-          aria-label="Vorherige Sektion"
-        >
+          className="hidden md:flex absolute left-1/2 -translate-x-[650px] top-1/2 -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl items-center justify-center"        >
           <svg
             className="w-6 h-6 text-white"
             fill="none"
@@ -314,8 +314,7 @@ export default function RotatingCarousel() {
       {currentIndex < sections.length - 1 && (
         <button
           onClick={nextSlide}
-          className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center"
-          aria-label="Nächste Sektion"
+          className="hidden md:flex absolute left-1/2 -translate-x-[-600px] top-1/2 -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl items-center justify-center"          aria-label="Nächste Sektion"
         >
           <svg
             className="w-6 h-6 text-white"

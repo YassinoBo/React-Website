@@ -5,7 +5,6 @@ import StoreGallery from "../components/StoreGallery";
 import { useLanguage } from '../LanguageContext.jsx';
 import { translations } from '../translations.js';
 import RotatingCarousel from "../components/RotatingCarousel";
-//import LocationPromotion from "../components/LocationPromotion";
 
 /* ======================
    1️⃣ Reviews
@@ -48,7 +47,6 @@ Fazit: Fünf Sterne in jeder Kategorie – Geschmack, Qualität, Service und Atm
   },
 ];
 
-
 /* ======================
    2️⃣ Sterne
 ====================== */
@@ -69,7 +67,6 @@ function Stars({ count }) {
   );
 }
 
-
 /* ======================
    3️⃣ Review Card
 ====================== */
@@ -85,7 +82,6 @@ function ReviewCard({ review }) {
     if (isLong) setExpanded(!expanded);
   };
 
-  // Initialen für Avatar
   const initials = review.name.split(' ').map(n => n[0]).join('').slice(0, 2);
 
   return (
@@ -125,23 +121,31 @@ function ReviewCard({ review }) {
   );
 }
 
+/* ======================
+   4️⃣ Reviews Carousel
+====================== */
 function ReviewsCarousel() {
-  const [startIndex, setStartIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [showMobileHint, setShowMobileHint] = useState(true);
-  const visibleCount = 4;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const cardWidth = 340 + 24; // 340px card + 24px gap
+  const visibleCount = 4; // Anzahl sichtbarer Reviews
+  const maxIndex = Math.max(0, reviews.length - visibleCount);
 
-  const handlePrev = () => setStartIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
-  const handleNext = () => setStartIndex((prev) => (prev + 1) % reviews.length);
-
-  const getVisibleReviews = () => {
-    const visible = [];
-    for (let i = 0; i < visibleCount; i++) {
-      visible.push(reviews[(startIndex + i) % reviews.length]);
-    }
-    return visible;
+  const handlePrev = () => {
+    if (isAnimating || currentIndex === 0) return;
+    setIsAnimating(true);
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
+    setTimeout(() => setIsAnimating(false), 400);
   };
 
-  // Mobile Hint nach 3 Sekunden ausblenden
+  const handleNext = () => {
+    if (isAnimating || currentIndex >= maxIndex) return;
+    setIsAnimating(true);
+    setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+    setTimeout(() => setIsAnimating(false), 400);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => setShowMobileHint(false), 120000);
     return () => clearTimeout(timer);
@@ -152,8 +156,9 @@ function ReviewsCarousel() {
       {/* Linker Pfeil */}
       <button
         onClick={handlePrev}
+        disabled={isAnimating || currentIndex === 0}
         aria-label="Vorherige Bewertung"
-        className="hidden md:flex absolute left-[-40px] top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center"
+        className="hidden md:flex absolute left-[-40px] top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         <svg
           className="w-6 h-6 text-white"
@@ -180,22 +185,28 @@ function ReviewsCarousel() {
         </div>
       )}
 
-      {/* Scrollbarer Container */}
-      <div 
-        className="flex gap-6 overflow-x-auto scrollbar-none items-start scroll-smooth touch-pan-x px-4"
-        onScroll={() => setShowMobileHint(false)}
-      >
-        {getVisibleReviews().map((review, i) => (
-          <ReviewCard key={i} review={review} />
-        ))}
+      {/* Scrollbarer Container mit sanftem Slide */}
+      <div className="overflow-hidden relative">
+        <div 
+          className="flex gap-6 items-start px-4 transition-transform duration-400 ease-in-out"
+          style={{
+            transform: `translateX(-${currentIndex * cardWidth}px)`
+          }}
+          onScroll={() => setShowMobileHint(false)}
+        >
+          {reviews.map((review, i) => (
+            <ReviewCard key={i} review={review} />
+          ))}
+        </div>
       </div>
 
       {/* Rechter Pfeil */}
       <button
         onClick={handleNext}
+        disabled={isAnimating || currentIndex >= maxIndex}
         aria-label="Nächste Bewertung"
-        className="hidden md:flex absolute right-[-60px] top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center" > 
-
+        className="hidden md:flex absolute right-[-60px] top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+      > 
         <svg
           className="w-6 h-6 text-white rotate-180"
           fill="none"
@@ -210,12 +221,13 @@ function ReviewsCarousel() {
 }
 
 /* ======================
-   4️⃣ Home Page
+   5️⃣ Home Page
 ====================== */
 export default function Home() {
   const { language } = useLanguage();
+  
   useEffect(() => {
-    document.title = "TirmaiYOU";
+    document.title = "TiramiYOU";
   }, []);
 
   return (
@@ -223,12 +235,8 @@ export default function Home() {
       {/* HERO */}
       <HomeHero />
 
-      {/* <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 px-6 lg:px-16 py-16"></div>*/}
+      {/* ROTATING CAROUSEL */}
       <RotatingCarousel />
-
-      {/* ANFAHRT
-      <LocationPromotion />
-      */}
 
       {/* LADEN FOTOS */}
       <StoreGallery />
@@ -243,7 +251,7 @@ export default function Home() {
           </div>
 
           <p className="text-sm text-gray-600">
-            {translations[language].based} <strong>111 {translations[language].review}</strong>
+            {translations[language].based} <strong>114 {translations[language].review}</strong>
           </p>
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
@@ -257,7 +265,6 @@ export default function Home() {
 
         <AccessibilityMenu />
       </section>
-
     </>
   );
 }

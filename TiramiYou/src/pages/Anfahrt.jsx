@@ -23,7 +23,7 @@ export default function Anfahrt() {
         <div className="grid lg:grid-cols-2 gap-8">
 
           {/* Linke Seite */}
-          <div className="rounded-3xl p-8 bg-white shadow-xl border-2 border-[#FF93A2]">
+          <div className="rounded-3xl p-8 bg-white shadow-xl border-2 border-[#FF93A2] no_hover">
 
             {/* Icon + Titel */}
             <div className="text-center flex items-center justify-center gap-4 mb-8">
@@ -78,9 +78,10 @@ export default function Anfahrt() {
             {/* Route Button */}
             <a
               href="https://www.google.com/maps/dir/?api=1&destination=Schneckenhofstraße+7,+60596+Frankfurt+am+Main"
+              id= "do_hover"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#FF93A2] text-white font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all"
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#FF93A2] text-white font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all hover"
             >
               <Navigation className="w-5 h-5" />
               {translations[language].route}
