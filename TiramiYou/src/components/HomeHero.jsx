@@ -43,7 +43,7 @@ export default function HomeHero() {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 flex w-full items-center justify-between px-12 lg:px-16">
+      <div className="relative z-10 flex flex-col lg:flex-row w-full items-center justify-center lg:justify-between px-8 lg:px-16 gap-12">
 
         {/* Links - Text & Logo */}
         <div className="text-center lg:text-left space-y-8">
@@ -59,34 +59,35 @@ export default function HomeHero() {
         </div>
 
         {/* Rechts - Diashow */}
-        <div className="relative h-[550px] lg:h-[650px] w-[750px] lg:w-[1200px]">
-          <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border-4" style={{ borderColor: '#FF93A2' }}>
-            {heroSlides.map((slide, index) => (
-              <div
-                key={index}
-                className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
-              >
-                {slide.type === 'image' ? (
-                  <img src={slide.src} alt={`Slide ${index + 1}`} className="w-full h-full object-cover no_hover" />
-                ) : (
-                  <video src={slide.src} className="w-full h-full object-cover" autoPlay muted loop />
-                )}
-              </div>
-            ))}
-          </div>
+<div className="relative w-full max-w-md md:max-w-lg lg:max-w-[1200px] h-64 md:h-96 lg:h-[650px]">
+  <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border-4" style={{ borderColor: '#FF93A2' }}>
+    {heroSlides.map((slide, index) => (
+      <div
+        key={index}
+        className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+      >
+        {slide.type === 'image' ? (
+          <img src={slide.src} alt={`Slide ${index + 1}`} className="w-full h-full object-cover no_hover" />
+        ) : (
+          <video src={slide.src} className="w-full h-full object-cover" autoPlay muted loop />
+        )}
+      </div>
+    ))}
+  </div>
 
-          {/* Slide Indicators */}
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'w-8' : 'bg-pink-300'}`}
-                style={index === currentSlide ? { backgroundColor: '#FF93A2' } : {}}
-              />
-            ))}
-          </div>
-        </div>
+  {/* Slide Indicators */}
+  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+    {heroSlides.map((_, index) => (
+      <button
+        key={index}
+        onClick={() => goToSlide(index)}
+        className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentSlide ? 'w-8' : 'bg-pink-300'}`}
+        style={index === currentSlide ? { backgroundColor: '#FF93A2' } : {}}
+      />
+    ))}
+  </div>
+</div>
+
       </div>
     </section>
   );

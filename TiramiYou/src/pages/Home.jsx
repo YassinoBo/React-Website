@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import AccessibilityMenu from "../components/AccessibilityMenu";
 import HomeHero from "../components/HomeHero.jsx";
 import StoreGallery from "../components/StoreGallery";
@@ -124,13 +124,18 @@ function ReviewCard({ review }) {
 /* ======================
    4️⃣ Reviews Carousel
 ====================== */
+
 function ReviewsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMobileHint, setShowMobileHint] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
-  const cardWidth = 340 + 24; // 340px card + 24px gap
-  const visibleCount = 4; // Anzahl sichtbarer Reviews
+  const cardWidth = 340 + 24; // 340px Card + 24px gap
+  const visibleCount = 4;
   const maxIndex = Math.max(0, reviews.length - visibleCount);
+  const { language } = useLanguage();
+
+  const scrollContainerRef = useRef(null);
+  const hintDismissedRef = useRef(false); // Damit es nur einmal passiert
 
   const handlePrev = () => {
     if (isAnimating || currentIndex === 0) return;
@@ -146,53 +151,49 @@ function ReviewsCarousel() {
     setTimeout(() => setIsAnimating(false), 400);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowMobileHint(false), 120000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Nur einmalig den Hinweis ausblenden beim ersten Scroll oder Touch
+  const handleUserScroll = () => {
+    if (!hintDismissedRef.current) {
+      setShowMobileHint(false);
+      hintDismissedRef.current = true;
+    }
+  };
 
   return (
     <div className="relative">
-      {/* Linker Pfeil */}
+      {/* Pfeile nur Desktop */}
       <button
         onClick={handlePrev}
         disabled={isAnimating || currentIndex === 0}
         aria-label="Vorherige Bewertung"
         className="hidden md:flex absolute left-[-40px] top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
-      {/* Mobile Swipe Indicator */}
+      {/* Mobile Swipe Hinweis */}
       {showMobileHint && (
         <div className="md:hidden absolute left-1/2 -translate-x-1/2 -top-12 z-20 animate-bounce">
           <div className="bg-[#FF93A2] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-            </svg>
-            Wischen zum Scrollen
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            {translations[language].scroll}
           </div>
         </div>
       )}
 
-      {/* Scrollbarer Container mit sanftem Slide */}
-      <div className="overflow-hidden relative">
-        <div 
-          className="flex gap-6 items-start px-4 transition-transform duration-400 ease-in-out"
+      {/* Carousel Container */}
+      <div
+        ref={scrollContainerRef}
+        className="overflow-x-auto md:overflow-hidden scrollbar-none px-4"
+        onScroll={handleUserScroll}     // Desktop und Mobile
+        onTouchStart={handleUserScroll} // Touch-Geräte
+      >
+        <div
+          className="flex gap-6 items-start md:transition-transform md:duration-400 md:ease-in-out"
           style={{
-            transform: `translateX(-${currentIndex * cardWidth}px)`
+            transform: `translateX(-${currentIndex * cardWidth}px)`,
           }}
-          onScroll={() => setShowMobileHint(false)}
         >
           {reviews.map((review, i) => (
             <ReviewCard key={i} review={review} />
@@ -200,25 +201,22 @@ function ReviewsCarousel() {
         </div>
       </div>
 
-      {/* Rechter Pfeil */}
+      {/* Pfeil rechts */}
       <button
         onClick={handleNext}
         disabled={isAnimating || currentIndex >= maxIndex}
         aria-label="Nächste Bewertung"
         className="hidden md:flex absolute right-[-60px] top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
-      > 
-        <svg
-          className="w-6 h-6 text-white rotate-180"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+      >
+        <svg className="w-6 h-6 text-white rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
     </div>
   );
 }
+
+
 
 /* ======================
    5️⃣ Home Page

@@ -23,13 +23,16 @@ export default function AccessibilityMenu() {
     localStorage.setItem('fontSize', fontSize.toString());
   }, [fontSize]);
 
-  // Sprache anwenden (wird jetzt im LanguageContext gespeichert)
+  // Sprache anwenden
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
-  // Großer Mauszeiger
+  // Großer Mauszeiger nur Desktop
   useEffect(() => {
+    const isDesktop = window.innerWidth >= 768; // ab md
+    if (!isDesktop) return;
+
     localStorage.setItem('bigCursor', bigCursor.toString());
 
     if (bigCursor) {
@@ -42,64 +45,7 @@ export default function AccessibilityMenu() {
           cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') 12 12, auto !important;
         }
         button:hover,
-        a:hover,  
-        #do_hover:hover, 
-        input:hover, 
-        select:hover, 
-        img:hover, 
-        svg:hover, 
-        path:hover,
-        #image-modal:hover,
-        .star-rating:hover,
-        [role="button"]:hover,
-        .clickable:hover,
-        .menu-item:hover,
-        .rating-stars:hover,
-        header img:hover,
-        footer img:hover,
-        nav a:hover,
-        .gallery-image:hover,
-        .modal-image:hover,
-        .close-button:hover,
-        iframe:hover,
-        iframe *:hover,
-        .leaflet-container:hover,
-        .leaflet-container *:hover,
-        .leaflet-interactive:hover,
-        [onclick]:hover,
-        [class*="button"]:hover,
-        [class*="btn"]:hover,
-        [class*="link"]:hover,
-        [class*="card"]:hover,
-        [class*="card"] *:hover,
-        [class*="hover"]:hover,
-        [class*="review"]:hover,
-        [class*="rating"]:hover,
-        [class*="testimonial"]:hover,
-        .review:hover,
-        .review *:hover,
-        .testimonial:hover,
-        .testimonial *:hover,
-        .rating:hover,
-        .rating *:hover,
-        [class*="review"] *:hover,
-        [class*="rating"] *:hover,
-        [class*="testimonial"] *:hover,
-        .perspective:hover,
-        .perspective *:hover,
-        .perspective div:hover,
-        [class*="rounded"]:hover,
-        [class*="shadow"]:hover,
-        [class*="bg-white"]:hover,
-        [class*="bg-white"] *:hover,
-        .fixed:hover,
-        .fixed button:hover {
-          cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="rgb(236, 72, 153)" stroke="white" stroke-width="1"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') 14 14, pointer !important;
-        }
-        .no_hover:hover,
-        .no_hover *:hover {
-          cursor: inherit !important;
-        }
+        a:hover { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="rgb(236, 72, 153)" stroke="white" stroke-width="1"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>') 14 14, pointer !important; }
       `;
       document.head.appendChild(style);
     } else {
@@ -128,7 +74,6 @@ export default function AccessibilityMenu() {
     };
   }, []);
 
-  // Reset
   function resetAll() {
     setFontSize(100);
     setBigCursor(false);
@@ -136,6 +81,8 @@ export default function AccessibilityMenu() {
     localStorage.removeItem('fontSize');
     localStorage.removeItem('bigCursor');
   }
+
+  const isDesktop = typeof window !== 'undefined' ? window.innerWidth >= 768 : true;
 
   return (
     <>
@@ -181,9 +128,7 @@ export default function AccessibilityMenu() {
             onChange={(e) => setFontSize(e.target.value)}
             className="w-full"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            {fontSize}%
-          </p>
+          <p className="text-xs text-gray-500 mt-1">{fontSize}%</p>
         </div>
 
         {/* Sprache */}
@@ -201,20 +146,22 @@ export default function AccessibilityMenu() {
           </select>
         </div>
 
-        {/* Weitere Funktionen */}
-        <div className="mb-6">
-          <p className="text-sm font-medium mb-2">
-            {translations[language].otherFeatures}
-          </p>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input
-              type="checkbox"
-              checked={bigCursor}
-              onChange={() => setBigCursor(!bigCursor)}
-            />
-            {translations[language].bigCursor}
-          </label>
-        </div>
+        {/* Weitere Funktionen nur Desktop */}
+        {isDesktop && (
+          <div className="mb-6">
+            <p className="text-sm font-medium mb-2">
+              {translations[language].otherFeatures}
+            </p>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={bigCursor}
+                onChange={() => setBigCursor(!bigCursor)}
+              />
+              {translations[language].bigCursor}
+            </label>
+          </div>
+        )}
 
         {/* Reset */}
         <button

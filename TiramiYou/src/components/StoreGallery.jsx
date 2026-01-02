@@ -38,7 +38,8 @@ export default function StoreGallery() {
         e.stopPropagation();
         setSelectedIndex((prev) => {
             const newIndex = (prev - 1 + storeImages.length) % storeImages.length;
-            setCurrentIndex(newIndex);
+            // Limitiere currentIndex
+            setCurrentIndex(Math.min(newIndex, storeImages.length - visibleCount));
             return newIndex;
         });
     };
@@ -47,10 +48,31 @@ export default function StoreGallery() {
         e.stopPropagation();
         setSelectedIndex((prev) => {
             const newIndex = (prev + 1) % storeImages.length;
-            setCurrentIndex(newIndex);
+            // Limitiere currentIndex
+            setCurrentIndex(Math.min(newIndex, storeImages.length - visibleCount));
             return newIndex;
         });
     };
+
+
+    useEffect(() => {
+        if (selectedIndex !== null) {
+            // Scrollen auf Body sperren
+            document.body.style.overflow = "hidden";
+            document.body.style.touchAction = "none"; // verhindert Touch-Swipe scroll
+        } else {
+            // Scrollen wieder erlauben
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+        }
+
+        return () => {
+            // Cleanup falls Komponent unmounted wird
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+        };
+    }, [selectedIndex]);
+
 
     return (
         <section className="max-w-7xl mx-auto px-4 py-24 relative">
@@ -64,7 +86,7 @@ export default function StoreGallery() {
 
             {/* Hauptkarussell Container */}
             <div className="relative">
-                
+
                 {/* Linker Pfeil */}
                 <button
                     onClick={handlePrev}
@@ -83,11 +105,11 @@ export default function StoreGallery() {
                 </button>
 
                 {/* Bilder Grid mit sanftem Slide */}
-                <div className="overflow-hidden relative">
-                    <div 
-                        className="flex gap-6 px-4 transition-transform duration-400 ease-in-out"
+                <div className="overflow-x-auto md:overflow-hidden scrollbar-none px-4">
+                    <div
+                        className={`flex gap-6 items-start md:transition-transform md:duration-400 md:ease-in-out`}
                         style={{
-                            transform: `translateX(-${currentIndex * imageWidth}px)`
+                            transform: `translateX(-${currentIndex * imageWidth}px)`,
                         }}
                     >
                         {storeImages.map((src, globalIndex) => (
@@ -95,26 +117,29 @@ export default function StoreGallery() {
                                 key={globalIndex}
                                 className="relative group flex-shrink-0 cursor-pointer"
                                 onClick={() => setSelectedIndex(globalIndex)}
+                                style={{
+                                    width: window.innerWidth < 768 ? "260px" : "288px", // <768px = Handy
+                                }}
                             >
+
                                 <div className="relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
                                     <img
                                         src={src}
                                         alt={`Store ${globalIndex + 1}`}
                                         className="h-72 w-72 object-cover transform group-hover:scale-105 transition-transform duration-500"
                                     />
-                                    {/* Overlay bei Hover */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         <div className="absolute bottom-4 left-4 right-4 text-white">
                                             <p className="text-sm font-medium">{translations[language].translate}</p>
                                         </div>
                                     </div>
                                 </div>
-                                {/* Dekorativer Ring */}
                                 <div className="absolute inset-0 rounded-3xl ring-2 ring-[#FF93A2]/0 group-hover:ring-[#FF93A2]/50 transition-all duration-300"></div>
                             </div>
                         ))}
                     </div>
                 </div>
+
 
                 {/* Rechter Pfeil */}
                 <button
@@ -139,6 +164,20 @@ export default function StoreGallery() {
                 <div
                     className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in"
                     onClick={() => setSelectedIndex(null)}
+                    onTouchStart={(e) => {
+                        // Touch-Start Position speichern
+                        const touch = e.touches[0];
+                        e.currentTarget.dataset.touchStartX = touch.clientX;
+                    }}
+                    onTouchEnd={(e) => {
+                        // Swipe erkennen
+                        const touch = e.changedTouches[0];
+                        const startX = parseFloat(e.currentTarget.dataset.touchStartX);
+                        const deltaX = touch.clientX - startX;
+
+                        if (deltaX > 50) handleModalPrev(e); // nach rechts swipen → vorheriges Bild
+                        if (deltaX < -50) handleModalNext(e); // nach links swipen → nächstes Bild
+                    }}
                 >
                     {/* Linker Pfeil Modal */}
                     <button
@@ -157,12 +196,11 @@ export default function StoreGallery() {
                     </button>
 
                     {/* Bild Container */}
-                    <div className="relative max-h-[85vh] max-w-[85vw] animate-scale-in">
+                    <div className="relative max-h-[85vh] max-w-[85vw] animate-scale-in" onClick={(e) => e.stopPropagation()}>
                         <img
                             src={storeImages[selectedIndex]}
                             alt="Vergrößerte Ansicht"
                             className="max-h-[85vh] max-w-[85vw] rounded-3xl shadow-2xl no_hover"
-                            onClick={(e) => e.stopPropagation()}
                         />
                         {/* Bildnummer */}
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium text-gray-800">
@@ -203,6 +241,7 @@ export default function StoreGallery() {
                     </button>
                 </div>
             )}
+
 
             <style jsx>{`
                 @keyframes fade-in {
