@@ -244,12 +244,12 @@ export default function Home() {
         <div className="text-center mb-12">
           <h3 className="text-xl font-semibold">{translations[language].good}</h3>
           <div className="flex justify-center items-center gap-2 my-2">
-            <span className="text-lg font-semibold leading-none">4,9</span>
+            <span className="text-lg font-semibold leading-none">4,8</span>
             <Stars count={5} />
           </div>
 
           <p className="text-sm text-gray-600">
-            {translations[language].based} <strong>114 {translations[language].review}</strong>
+            {translations[language].based} <strong>122 {translations[language].review}</strong>
           </p>
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
