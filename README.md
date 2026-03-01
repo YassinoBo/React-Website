@@ -3,7 +3,7 @@
 A client-oriented React web application developed in collaboration with **TiramiYou**, a local dessert shop in Frankfurt am Main.
 
 📍 Schneckenhofstraße 7, 60596 Frankfurt am Main  
-  Developed in collaboration with: https://github.com/Aymxn147  
+  Developed in collaboration with [Aymxn147](https://github.com/Aymxn147) 
 
 > This project was built as a real-world collaboration with the owners of TiramiYou.
 
