@@ -1,36 +1,37 @@
 # TiramiYou – React Web Application
 
-A modern React-based web application developed for the local dessert shop **TiramiYou** in Frankfurt am Main.
+A client-oriented React web application developed in collaboration with **TiramiYou**, a local dessert shop in Frankfurt am Main.
 
 📍 Schneckenhofstraße 7, 60596 Frankfurt am Main  
-Developed in collaboration with [Aymxn147](https://github.com/Aymxn147)  
+  Developed in collaboration with: https://github.com/Aymxn147  
 
-> This project was built as a real client project for a local business.
+> This project was built as a real-world collaboration with the owners of TiramiYou.
 
 ---
 
 ## 🧾 Project Overview
 
-TiramiYou is a responsive, accessibility-focused React web application designed to present the shop, its products, and customer reviews in a modern and interactive way.
+This project was developed for **TiramiYou**, a local dessert shop in Frankfurt, with the goal of creating a modern and accessible web presence.
 
-The focus of the project was:
+The application showcases:
 
-- Clean UI/UX
-- Accessibility features
-- Responsive design (mobile-first approach)
-- Structured routing
-- Maintainable component architecture
+- The shop and its brand identity
+- Product highlights
+- Customer reviews
+- News and promotional content
+
+Although the application was not publicly deployed due to internal business circumstances, it was fully developed as a real stakeholder-driven project with direct feedback from the shop owners.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **React**
-- **Vite**
-- **React Router**
-- **JavaScript (ES6+)**
-- **CSS**
-- npm
+- React  
+- Vite  
+- React Router  
+- JavaScript (ES6+)  
+- CSS  
+- npm  
 
 ---
 
@@ -61,94 +62,90 @@ npm run dev
 
 ### 🏠 Interactive Home Page
 
-- Hero slideshow with manual navigation
-- Automatic timer reset logic
-- Scroll-to-section buttons
-- Dynamic review expansion ("Mehr"-Button behavior)
-- News flyer integration
-- Animated transitions
-- Hover effects
-- Product podium showcase (Top 1–3 Tiramisus)
+- Hero slideshow with manual navigation  
+- Custom timer reset logic  
+- Scroll-to-section navigation  
+- Expandable review sections  
+- News flyer integration  
+- Animated transitions  
+- Hover interaction effects  
+- Product podium showcase (Top 1–3 Tiramisus)  
 
 ---
 
 ### 📱 Responsive Design
 
-- Mobile-optimized layout
-- Scroll-based navigation on mobile devices
-- Section behavior adapted specifically for smartphone UX
-- Layout refinements for different screen sizes
+- Mobile-optimized layout  
+- Scroll-based interaction behavior on smartphones  
+- Device-specific layout adjustments  
+- Responsive section restructuring  
 
 ---
 
-### ♿ Accessibility Features
+### ♿ Accessibility System
 
-A strong focus was placed on accessibility:
+Special focus was placed on inclusive and accessible design:
 
-- Global accessibility toggle
-- "Big Mouse" cursor mode
-- Multi-language support (German / English)
-- Persistent language state across route changes
-- Improved hover state detection
-- Color consistency in accessibility modes
-- Correct behavior across all interactive elements
+- Global accessibility toggle  
+- “Big Mouse” cursor mode  
+- German / English language switch  
+- Persistent language state across route changes  
+- Hover state consistency fixes  
+- Improved interaction feedback across accessibility modes  
 
-Accessibility edge cases were actively debugged and refined.
+Edge cases were actively debugged to ensure consistent behavior across devices and interaction states.
 
 ---
 
 ## 🧠 My Responsibilities
 
-Within the team, I was responsible for:
+Within the project, I was responsible for:
 
-- Extending project documentation (Wiki ideas page)
-- Creating routing structure and pages
-- Interface and state management
-- UI/UX improvements for the Home tab
-- Slideshow logic and timer handling
-- Scroll behavior implementation
-- Review expansion interaction improvements
-- Mobile-specific layout behavior
-- Accessibility system debugging and refinement
-- Language persistence across navigation
-- Hover state consistency fixes
-- Animation implementation
-- Button styling and interaction feedback
+- Structuring and extending project documentation  
+- Designing and implementing routing architecture  
+- Interface and state management  
+- UI/UX redesign of the Home tab  
+- Slideshow timing logic implementation  
+- Scroll behavior engineering  
+- Review interaction improvements  
+- Mobile-specific behavior adjustments  
+- Accessibility feature debugging and refinement  
+- Language persistence handling across route changes  
+- Animation and hover interaction improvements  
 
-This included multiple iterative refinements and debugging sessions to ensure consistent behavior across devices and accessibility modes.
+This work included iterative refinements based on discussions with the shop owners.
 
 ---
 
 ## 🎯 Technical Highlights
 
-- Component-based architecture
-- Controlled state handling across routes
-- Custom slideshow timer logic
-- Scroll-triggered UI interactions
-- Accessibility state persistence
-- Responsive conditional rendering
-- Edge-case hover behavior debugging
+- Component-based architecture  
+- Structured routing with state consistency  
+- Custom slideshow timing logic  
+- Scroll-triggered UI interactions  
+- Accessibility state persistence  
+- Conditional rendering for device-specific UX  
+- Systematic debugging of UI edge cases  
 
 ---
 
 ## 📌 Project Status
 
-The application is currently not publicly deployed.  
-It was developed as a client project and can be run locally using the setup instructions above.
+The application is currently not publicly deployed.
+
+It was developed in collaboration with TiramiYou as a practical real-world frontend project and can be run locally using the setup instructions above.
 
 ---
 
-## 🤝 Collaboration
+## 🤝 Collaboration Context
 
-Developed together with:
+This project was initiated proactively as a learning-driven collaboration with TiramiYou.
 
-- https://github.com/Aymxn147
-
-Client: TiramiYou (Frankfurt am Main)
+The focus was on applying frontend best practices, accessibility standards, and structured UI development in a real stakeholder environment.
 
 ---
 
 ## 📄 License
 
-This project was developed for a real client.  
+This project was developed in collaboration with TiramiYou.  
 Usage or redistribution requires permission.
