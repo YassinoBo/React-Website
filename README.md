@@ -3,7 +3,7 @@
 A modern React-based web application developed for the local dessert shop **TiramiYou** in Frankfurt am Main.
 
 📍 Schneckenhofstraße 7, 60596 Frankfurt am Main  
-👨‍💻 Developed in collaboration with [Aymxn147](https://github.com/Aymxn147)  
+Developed in collaboration with [Aymxn147](https://github.com/Aymxn147)  
 
 > This project was built as a real client project for a local business.
 
