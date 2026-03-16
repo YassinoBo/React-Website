@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "tailwind:init": "tailwindcss init -p",
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

@@ -153,7 +153,7 @@ function Produkte() {
 
         {/* Call-to-Action */}
         <div className="mt-16 text-center">
-          <div className="bg-white rounded-3xl border-2 border-[#FF93A2] p-8 md:p-12 shadow-xl">
+          <div className="bg-white rounded-3xl border-2 border-[#FF93A2] p-8 md:p-12 shadow-xl no_hover">
             <h2 className="text-3xl md:text-4xl font-black mb-4" style={{ color: '#FF93A2' }}>
               {translations[language].feel}
             </h2>
@@ -162,6 +162,7 @@ function Produkte() {
             </p>
             <a
               href="/anfahrt"
+              id="do_hover"
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#FF93A2] text-white font-bold text-lg rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300"
             >
               📍 {translations[language].visit}
@@ -169,6 +170,7 @@ function Produkte() {
             <div className="mt-4">
               <a
                 href="/TiramiYou-Speisekarte.pdf"
+                id="do_hover"
                 download="TiramiYou-Speisekarte.pdf"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#FF93A2] font-bold border-2 border-[#FF93A2] rounded-full hover:bg-[#FF93A2] hover:text-white transition-all duration-300"
               >
