@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import AccessibilityMenu from "../components/AccessibilityMenu";
 import HomeHero from "../components/HomeHero.jsx";
 import StoreGallery from "../components/StoreGallery";
 import { useLanguage } from '../LanguageContext.jsx';
 import { translations } from '../translations.js';
-
+import RotatingCarousel from "../components/RotatingCarousel";
 
 /* ======================
    1️⃣ Reviews
@@ -36,7 +36,7 @@ Viel Erfolg, freue mich weitere Sorten zu probieren!`,
   },
   {
     name: "Irfan Nurkovic",
-    text: `Ein neuer Lieblingsort in Frankfurt! Stilvolles, gemütliches Ambiente, superfreundliches Team und himmlische Desserts – das Tiramisu ist einfach perfekt: cremig, frisch und voller Geschmack. Dazu gibt’s hervorragenden Kaffee, der alles abrundet.
+    text: `Ein neuer Lieblingsort in Frankfurt! Stilvolles, gemütliches Ambiente, superfreundliches Team und himmlische Desserts – das Tiramisu ist einfach perfekt: cremig, frisch und voller Geschmack. Dazu gibt's hervorragenden Kaffee, der alles abrundet.
 Fazit: Fünf Sterne in jeder Kategorie – Geschmack, Qualität, Service und Atmosphäre. Ein Muss für alle, die guten Kaffee und feine Desserts lieben!`,
     stars: 5,
   },
@@ -47,7 +47,6 @@ Fazit: Fünf Sterne in jeder Kategorie – Geschmack, Qualität, Service und Atm
   },
 ];
 
-
 /* ======================
    2️⃣ Sterne
 ====================== */
@@ -57,7 +56,7 @@ function Stars({ count }) {
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
-          className={`w-4 h-4 ${i < count ? "text-yellow-400" : "text-gray-300"}`}
+          className={`w-5 h-5 ${i < count ? "text-yellow-400" : "text-gray-300"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -67,7 +66,6 @@ function Stars({ count }) {
     </div>
   );
 }
-
 
 /* ======================
    3️⃣ Review Card
@@ -80,97 +78,137 @@ function ReviewCard({ review }) {
     ? review.text.slice(0, 150)
     : review.text;
 
-  // Klick auf die gesamte Box nur erlaubt, wenn Text länger als 150 Zeichen
   const handleClick = () => {
     if (isLong) setExpanded(!expanded);
   };
 
+  const initials = review.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+
   return (
     <div
       onClick={handleClick}
-      className="bg-white rounded-xl shadow p-5 flex flex-col gap-3 cursor-pointer w-[300px] flex-shrink-0"
+      className={`bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 flex flex-col gap-4 w-[340px] flex-shrink-0 transition-all duration-300 border border-gray-100 ${isLong ? 'cursor-pointer' : ''}`}
     >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
-          {review.name[0]}
-        </div>
-        <div>
-          <p className="text-sm font-semibold">{review.name}</p>
-          <Stars count={review.stars} />
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FF93A2] to-[#FF6B7A] flex items-center justify-center font-bold text-white text-sm shadow-md">
+            {initials}
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900">{review.name}</p>
+            <Stars count={review.stars} />
+          </div>
         </div>
       </div>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-gray-700 leading-relaxed">
         {displayText}
         {isLong && !expanded && "..."}
-        {isLong && (
-          <span
-            onClick={(e) => {
-              e.stopPropagation();
-              setExpanded(!expanded);
-            }}
-            className="text-pink-500 font-semibold ml-1 cursor-pointer"
-          >
-            {expanded ? "weniger" : "mehr"}
-          </span>
-        )}
       </p>
+
+      {isLong && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
+          className="text-[#FF93A2] font-semibold text-sm hover:text-[#FF6B7A] transition-colors self-start"
+        >
+          {expanded ? "weniger anzeigen" : "mehr lesen"}
+        </button>
+      )}
     </div>
   );
 }
 
-
+/* ======================
+   4️⃣ Reviews Carousel
+====================== */
 
 function ReviewsCarousel() {
-  const [startIndex, setStartIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showMobileHint, setShowMobileHint] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const cardWidth = 340 + 24; // 340px Card + 24px gap
   const visibleCount = 4;
+  const maxIndex = Math.max(0, reviews.length - visibleCount);
+  const { language } = useLanguage();
 
-  const handlePrev = () => setStartIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
-  const handleNext = () => setStartIndex((prev) => (prev + 1) % reviews.length);
+  const scrollContainerRef = useRef(null);
+  const hintDismissedRef = useRef(false); // Damit es nur einmal passiert
 
-  const getVisibleReviews = () => {
-    const visible = [];
-    for (let i = 0; i < visibleCount; i++) {
-      visible.push(reviews[(startIndex + i) % reviews.length]);
+  const handlePrev = () => {
+    if (isAnimating || currentIndex === 0) return;
+    setIsAnimating(true);
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
+    setTimeout(() => setIsAnimating(false), 400);
+  };
+
+  const handleNext = () => {
+    if (isAnimating || currentIndex >= maxIndex) return;
+    setIsAnimating(true);
+    setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+    setTimeout(() => setIsAnimating(false), 400);
+  };
+
+  // Nur einmalig den Hinweis ausblenden beim ersten Scroll oder Touch
+  const handleUserScroll = () => {
+    if (!hintDismissedRef.current) {
+      setShowMobileHint(false);
+      hintDismissedRef.current = true;
     }
-    return visible;
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto">
-      {/* Linker Pfeil */}
+    <div className="relative">
+      {/* Pfeile nur Desktop */}
       <button
         onClick={handlePrev}
-        className="absolute left-[-75px] top-1/2 transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl">
-        <svg
-          className="w-6 h-6 text-white"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        disabled={isAnimating || currentIndex === 0}
+        aria-label="Vorherige Bewertung"
+        className="hidden md:flex absolute left-[-40px] top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+      >
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
-      {/* Scrollbarer Container */}
-      <div className="flex gap-6 overflow-x-auto scrollbar-none items-start scroll-snap-x touch-pan-x -webkit-overflow-scrolling:touch">
-        {getVisibleReviews().map((review, i) => (
-          <div className="scroll-snap-start">
-            <ReviewCard key={i} review={review} />
+      {/* Mobile Swipe Hinweis */}
+      {showMobileHint && (
+        <div className="md:hidden absolute left-1/2 -translate-x-1/2 -top-12 z-20 animate-bounce">
+          <div className="bg-[#FF93A2] text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg flex items-center gap-2">
+            {translations[language].scroll}
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* Carousel Container */}
+      <div
+        ref={scrollContainerRef}
+        className="overflow-x-auto md:overflow-hidden scrollbar-none px-4"
+        onScroll={handleUserScroll}     // Desktop und Mobile
+        onTouchStart={handleUserScroll} // Touch-Geräte
+      >
+        <div
+          className="flex gap-6 items-start md:transition-transform md:duration-400 md:ease-in-out"
+          style={{
+            transform: `translateX(-${currentIndex * cardWidth}px)`,
+          }}
+        >
+          {reviews.map((review, i) => (
+            <ReviewCard key={i} review={review} />
+          ))}
+        </div>
       </div>
 
-      {/* Rechter Pfeil */}
+      {/* Pfeil rechts */}
       <button
         onClick={handleNext}
-        className="absolute right-[-75px] top-1/2 transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl">
-        <svg
-          className="w-6 h-6 text-white rotate-180"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        disabled={isAnimating || currentIndex >= maxIndex}
+        aria-label="Nächste Bewertung"
+        className="hidden md:flex absolute right-[-60px] top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+      >
+        <svg className="w-6 h-6 text-white rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
@@ -181,12 +219,13 @@ function ReviewsCarousel() {
 
 
 /* ======================
-   4️⃣ Home Page
+   5️⃣ Home Page
 ====================== */
 export default function Home() {
   const { language } = useLanguage();
+  
   useEffect(() => {
-    document.title = "TirmaiYOU";
+    document.title = "TiramiYOU";
   }, []);
 
   return (
@@ -194,31 +233,8 @@ export default function Home() {
       {/* HERO */}
       <HomeHero />
 
-      {/* BEREICHE */}
-      <section className="bg-[rgb(255,240,243)] py-20">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl md:text-3xl text-gray-600 mb-12">
-            {translations[language].more}
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: translations[language].tiramisu, href: "/produkte" },
-              { title: translations[language].news, href: "/news" },
-              { title: translations[language].direct, href: "/anfahrt" },
-            ].map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="block bg-white rounded-2xl p-6 text-center shadow hover:shadow-lg transition"
-              >
-                <h3 className="font-semibold">{item.title}</h3>
-              </a>
-            ))}
-
-          </div>
-        </div>
-      </section>
+      {/* ROTATING CAROUSEL */}
+      <RotatingCarousel />
 
       {/* LADEN FOTOS */}
       <StoreGallery />
@@ -228,12 +244,12 @@ export default function Home() {
         <div className="text-center mb-12">
           <h3 className="text-xl font-semibold">{translations[language].good}</h3>
           <div className="flex justify-center items-center gap-2 my-2">
-            <span className="text-lg font-semibold leading-none">4,9</span>
+            <span className="text-lg font-semibold leading-none">4,8</span>
             <Stars count={5} />
           </div>
 
           <p className="text-sm text-gray-600">
-            {translations[language].based} <strong>109 {translations[language].review}</strong>
+            {translations[language].based} <strong>122 {translations[language].review}</strong>
           </p>
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
@@ -247,7 +263,6 @@ export default function Home() {
 
         <AccessibilityMenu />
       </section>
-
     </>
   );
 }

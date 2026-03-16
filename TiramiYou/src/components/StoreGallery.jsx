@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLanguage } from '../LanguageContext.jsx';
 import { translations } from '../translations.js';
 
@@ -13,34 +13,33 @@ const storeImages = [
 
 export default function StoreGallery() {
     const { language } = useLanguage();
-    const [selectedIndex, setSelectedIndex] = useState(null); // Index für Modal
-    const [startIndex, setStartIndex] = useState(0); // Index für Hauptkarussell
-    const visibleCount = 4; // Anzahl Bilder sichtbar
+    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const imageWidth = 288 + 24; // 72*4 = 288px + 24px gap
+    const visibleCount = 4; // Anzahl sichtbarer Bilder
+    const maxIndex = Math.max(0, storeImages.length - visibleCount);
 
-    // Hauptkarussell Buttons
     const handlePrev = () => {
-        setStartIndex((prev) =>
-            (prev - 1 + storeImages.length) % storeImages.length
-        );
+        if (isAnimating || currentIndex === 0) return;
+        setIsAnimating(true);
+        setCurrentIndex((prev) => Math.max(0, prev - 1));
+        setTimeout(() => setIsAnimating(false), 400);
     };
 
     const handleNext = () => {
-        setStartIndex((prev) => (prev + 1) % storeImages.length);
-    };
-
-    const getVisibleImages = () => {
-        const visible = [];
-        for (let i = 0; i < visibleCount; i++) {
-            visible.push(storeImages[(startIndex + i) % storeImages.length]);
-        }
-        return visible;
+        if (isAnimating || currentIndex >= maxIndex) return;
+        setIsAnimating(true);
+        setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+        setTimeout(() => setIsAnimating(false), 400);
     };
 
     const handleModalPrev = (e) => {
         e.stopPropagation();
         setSelectedIndex((prev) => {
             const newIndex = (prev - 1 + storeImages.length) % storeImages.length;
-            if (newIndex < startIndex) setStartIndex(newIndex);
+            // Limitiere currentIndex
+            setCurrentIndex(Math.min(newIndex, storeImages.length - visibleCount));
             return newIndex;
         });
     };
@@ -49,76 +48,145 @@ export default function StoreGallery() {
         e.stopPropagation();
         setSelectedIndex((prev) => {
             const newIndex = (prev + 1) % storeImages.length;
-            if (newIndex >= startIndex + visibleCount) setStartIndex(newIndex - visibleCount + 1);
+            // Limitiere currentIndex
+            setCurrentIndex(Math.min(newIndex, storeImages.length - visibleCount));
             return newIndex;
         });
     };
 
+
+    useEffect(() => {
+        if (selectedIndex !== null) {
+            // Scrollen auf Body sperren
+            document.body.style.overflow = "hidden";
+            document.body.style.touchAction = "none"; // verhindert Touch-Swipe scroll
+        } else {
+            // Scrollen wieder erlauben
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+        }
+
+        return () => {
+            // Cleanup falls Komponent unmounted wird
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+        };
+    }, [selectedIndex]);
+
+
     return (
-        <section className="max-w-6xl mx-auto px-4 py-20 relative">
-            <h2 className="text-2xl font-semibold text-center mb-10">
-                {translations[language].store}
-            </h2>
+        <section className="max-w-7xl mx-auto px-4 py-24 relative">
+            {/* Überschrift mit Gradient */}
+            <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#FF93A2] via-[#FF6B7A] to-[#FF93A2] bg-clip-text text-transparent mb-3">
+                    {translations[language].store}
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#FF93A2] to-transparent mx-auto rounded-full"></div>
+            </div>
 
-            {/* Hauptkarussell */}
-            {/* Linker Pfeil */}
-            <button
-                onClick={handlePrev}
-                className="absolute left-[-50px] top-[280px] transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl"            >
-                <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            {/* Hauptkarussell Container */}
+            <div className="relative">
+
+                {/* Linker Pfeil */}
+                <button
+                    onClick={handlePrev}
+                    disabled={isAnimating || currentIndex === 0}
+                    aria-label="Vorheriges Bild"
+                    className="hidden md:flex absolute left-[-25px] top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl group disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
+                    <svg
+                        className="w-6 h-6 text-white transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
 
-            <div className="flex gap-4 overflow-x-auto scrollbar-none touch-pan-x scroll-smooth">
-  {getVisibleImages().map((src, i) => {
-    const globalIndex = (startIndex + i) % storeImages.length;
-    return (
-      <img
-        key={i}
-        src={src}
-        alt={`Store ${i}`}
-        className="rounded-2xl h-64 w-64 object-cover shadow flex-shrink-0 cursor-pointer hover:scale-105 transition-transform scroll-snap-start"
-        onClick={() => setSelectedIndex(globalIndex)}
-      />
-    );
-  })}
-</div>
+                {/* Bilder Grid mit sanftem Slide */}
+                <div className="overflow-x-auto md:overflow-hidden scrollbar-none px-4">
+                    <div
+                        className={`flex gap-6 items-start md:transition-transform md:duration-400 md:ease-in-out`}
+                        style={{
+                            transform: `translateX(-${currentIndex * imageWidth}px)`,
+                        }}
+                    >
+                        {storeImages.map((src, globalIndex) => (
+                            <div
+                                key={globalIndex}
+                                className="relative group flex-shrink-0 cursor-pointer"
+                                onClick={() => setSelectedIndex(globalIndex)}
+                                style={{
+                                    width: window.innerWidth < 768 ? "260px" : "288px", // <768px = Handy
+                                }}
+                            >
+
+                                <div className="relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                                    <img
+                                        src={src}
+                                        alt={`Store ${globalIndex + 1}`}
+                                        className="h-72 w-72 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <div className="absolute bottom-4 left-4 right-4 text-white">
+                                            <p className="text-sm font-medium">{translations[language].translate}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="absolute inset-0 rounded-3xl ring-2 ring-[#FF93A2]/0 group-hover:ring-[#FF93A2]/50 transition-all duration-300"></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
 
-            {/* Rechter Pfeil */}
-            <button
-                onClick={handleNext}
-                className="absolute right-[0px] top-[280px] transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-                <svg
-                    className="w-6 h-6 text-white rotate-180"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {/* Rechter Pfeil */}
+                <button
+                    onClick={handleNext}
+                    disabled={isAnimating || currentIndex >= maxIndex}
+                    aria-label="Nächstes Bild"
+                    className="hidden md:flex absolute right-[-30px] top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-3 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl group disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
+                    <svg
+                        className="w-6 h-6 text-white transition-colors rotate-180"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
 
-            {/* Modal mit synchronisiertem Hauptkarussell */}
+            {/* Modal */}
             {selectedIndex !== null && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in"
                     onClick={() => setSelectedIndex(null)}
+                    onTouchStart={(e) => {
+                        // Touch-Start Position speichern
+                        const touch = e.touches[0];
+                        e.currentTarget.dataset.touchStartX = touch.clientX;
+                    }}
+                    onTouchEnd={(e) => {
+                        // Swipe erkennen
+                        const touch = e.changedTouches[0];
+                        const startX = parseFloat(e.currentTarget.dataset.touchStartX);
+                        const deltaX = touch.clientX - startX;
+
+                        if (deltaX > 50) handleModalPrev(e); // nach rechts swipen → vorheriges Bild
+                        if (deltaX < -50) handleModalNext(e); // nach links swipen → nächstes Bild
+                    }}
                 >
-                    
-                    {/* Linker Pfeil */}
+                    {/* Linker Pfeil Modal */}
                     <button
-                        onClick={handleModalPrev}
-                        className="absolute left-[100px] top-1/2 transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl"                    >
+                        onClick={(e) => { e.stopPropagation(); handleModalPrev(e); }}
+                        aria-label="Vorheriges Bild"
+                        className="hidden md:flex absolute left-20 top-1/2 -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center"
+                    >
                         <svg
-                            className="w-6 h-6 text-white"
+                            className="w-7 h-7 text-white"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -127,19 +195,27 @@ export default function StoreGallery() {
                         </svg>
                     </button>
 
-                    <img
-                        src={storeImages[selectedIndex]}
-                        alt="Enlarged"
-                        className="max-h-[90%] max-w-[90%] rounded-2xl shadow-lg"
-                        onClick={(e) => e.stopPropagation()}
-                    />
+                    {/* Bild Container */}
+                    <div className="relative max-h-[85vh] max-w-[85vw] animate-scale-in" onClick={(e) => e.stopPropagation()}>
+                        <img
+                            src={storeImages[selectedIndex]}
+                            alt="Vergrößerte Ansicht"
+                            className="max-h-[85vh] max-w-[85vw] rounded-3xl shadow-2xl no_hover"
+                        />
+                        {/* Bildnummer */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium text-gray-800">
+                            {selectedIndex + 1} / {storeImages.length}
+                        </div>
+                    </div>
 
-                    {/* Rechter Pfeil */}
+                    {/* Rechter Pfeil Modal */}
                     <button
-                        onClick={handleModalNext}
-                        className="absolute right-[100px] top-1/2 transform -translate-y-1/2 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF7B8C] transition-all duration-300 shadow-lg hover:shadow-xl"                    >
+                        onClick={(e) => { e.stopPropagation(); handleModalNext(e); }}
+                        aria-label="Nächstes Bild"
+                        className="hidden md:flex absolute right-20 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-[#FF93A2] rounded-full p-4 hover:bg-[#FF6B7A] hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl items-center justify-center"
+                    >
                         <svg
-                            className="w-6 h-6 text-white rotate-180"
+                            className="w-7 h-7 text-white rotate-180"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -148,14 +224,50 @@ export default function StoreGallery() {
                         </svg>
                     </button>
 
+                    {/* Schließen Button */}
                     <button
                         onClick={() => setSelectedIndex(null)}
-                        className="absolute top-5 right-5 text-white text-3xl font-bold"
+                        aria-label="Schließen"
+                        className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full w-12 h-12 flex items-center justify-center hover:bg-[#FF93A2] hover:rotate-90 transition-all duration-300 shadow-xl group"
                     >
-                        &times;
+                        <svg
+                            className="w-6 h-6 text-gray-800 group-hover:text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 6l12 12M6 18L18 6" />
+                        </svg>
                     </button>
                 </div>
             )}
+
+
+            <style jsx>{`
+                @keyframes fade-in {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                
+                @keyframes scale-in {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.9);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+                
+                .animate-fade-in {
+                    animation: fade-in 0.3s ease-out;
+                }
+                
+                .animate-scale-in {
+                    animation: scale-in 0.3s ease-out;
+                }
+            `}</style>
         </section>
     );
 }
